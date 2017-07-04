@@ -5,6 +5,10 @@ from astropy.coordinates import SkyCoord, Angle, UnitSphericalRepresentation, \
 from matplotlib.patches import FancyArrowPatch
 from mpl_toolkits.mplot3d import proj3d
 
+"""
+
+"""
+
 
 class ExtSkyCoord(SkyCoord):
     """
@@ -179,11 +183,11 @@ def plotradec(ra, dec, fig, viewaz = -45, viewel=30., pa = None):
     :param pa:
     :return:
     """
-    sx = ESkyCoord(ra=0 * u.deg, dec=0*u.deg, frame='icrs')
-    sy = ESkyCoord(ra=90 * u.deg, dec=0*u.deg, frame='icrs')
-    sz = ESkyCoord(ra=0 * u.deg, dec=90*u.deg, frame='icrs')
-    sp = ESkyCoord(ra=ra, dec=dec, frame='icrs')
-    s = ESkyCoord([sx, sy, sz, sp])
+    sx = ExtSkyCoord(ra=0 * u.deg, dec=0*u.deg, frame='icrs')
+    sy = ExtSkyCoord(ra=90 * u.deg, dec=0*u.deg, frame='icrs')
+    sz = ExtSkyCoord(ra=0 * u.deg, dec=90*u.deg, frame='icrs')
+    sp = ExtSkyCoord(ra=ra, dec=dec, frame='icrs')
+    s = ExtSkyCoord([sx, sy, sz, sp])
     xyz = s.cartesian
 
     ax = fig.gca(projection='3d')
@@ -193,8 +197,8 @@ def plotradec(ra, dec, fig, viewaz = -45, viewel=30., pa = None):
 
     # Draw the unit vectors and the object and label them
     for i in range(3):
-        a = Arrow3D([0, xyz.x[i]], [0, xyz.y[i]], [0, xyz.z[i]], mutation_scale=20,
-                    lw=3, arrowstyle="->", color="k")
+        a = Arrow3D([0, xyz.x[i]], [0, xyz.y[i]], [0, xyz.z[i]],
+                    mutation_scale=20, lw=3, arrowstyle="->", color="k")
         ax.add_artist(a)
     ax.text(xyz.x[0], xyz.y[0], xyz.z[0], r'$+\vec{x}$',size=20)
     ax.text(xyz.x[1], xyz.y[1], xyz.z[1], r'$+\vec{y}$',size=20)
@@ -231,7 +235,7 @@ def plotradec(ra, dec, fig, viewaz = -45, viewel=30., pa = None):
 
     raplot = np.ones(decplot.shape) * ra
 
-    splot = ESkyCoord(ra=raplot, dec=decplot, frame='icrs').cartesian
+    splot = ExtSkyCoord(ra=raplot, dec=decplot, frame='icrs').cartesian
 
     ax.plot(splot.x, splot.y, splot.z, ':r')
     ax.plot([splot.x[0], 0], [splot.y[0], 0], [splot.z[0], 0], ':r')
@@ -240,7 +244,8 @@ def plotradec(ra, dec, fig, viewaz = -45, viewel=30., pa = None):
                 lw=3, arrowstyle="->")
     ax.add_artist(b)
     nb = int(len(splot.x)/2)
-    ax.text(splot.x[nb], splot.y[nb], splot.z[nb], r'$\delta$', size=20, color='r')
+    ax.text(splot.x[nb], splot.y[nb], splot.z[nb], r'$\delta$', size=20,
+            color='r')
 
     raplot = np.arange(0, ra.degree) * u.deg
     decplot = raplot * 0.
@@ -251,7 +256,8 @@ def plotradec(ra, dec, fig, viewaz = -45, viewel=30., pa = None):
                 lw=3, arrowstyle="->")
     ax.add_artist(b)
     nb = int(len(splot.x)/2)
-    ax.text(splot.x[nb], splot.y[nb], splot.z[nb], r'$\alpha$', size=20, color='r')
+    ax.text(splot.x[nb], splot.y[nb], splot.z[nb], r'$\alpha$', size=20,
+            color='r')
     ax.text(0.1, 0.1, 1.2, 'North', size=20)
     ax.text(0.1, 1.4, 0.1, 'East', size=20)
 
@@ -266,19 +272,22 @@ def plotradec(ra, dec, fig, viewaz = -45, viewel=30., pa = None):
         paa = sp.position_angle(spc)
         ii = np.argmin(np.abs(paa - pa))
         xyzpa = spc[ii].cartesian
-        c = Arrow3D([xyz[3].x, xyzpa.x], [xyz[3].y, xyzpa.y], [xyz[3].z, xyzpa.z], mutation_scale=20,
+        c = Arrow3D([xyz[3].x, xyzpa.x], [xyz[3].y, xyzpa.y],
+                    [xyz[3].z, xyzpa.z], mutation_scale=20,
                     lw=3, arrowstyle="->", color="g")
         ax.add_artist(c)
         ii0 = np.argmin(np.abs(paa))
         xyzpa0 = spc[ii0].cartesian
-        ax.plot([xyz[3].x, xyzpa0.x], [xyz[3].y, xyzpa0.y], [xyz[3].z, xyzpa0.z], 'g--')
+        ax.plot([xyz[3].x, xyzpa0.x], [xyz[3].y, xyzpa0.y],
+                [xyz[3].z, xyzpa0.z], 'g--')
         xyzpp = spc.cartesian
         if ii0 > 0:
             ax.plot(xyzpp[ii:ii0].x, xyzpp[ii:ii0].y, xyzpp[ii:ii0].z, 'g--')
         else:
             ax.plot(xyzpp[ii0:ii].x, xyzpp[ii0:ii].y, xyzpp[ii0:ii].z, 'g--')
         imid = int((ii + ii0) / 2)
-        ax.text(xyzpp[imid].x, xyzpp[imid].y, xyzpp[imid].z, 'PA', color='g', size=20)
+        ax.text(xyzpp[imid].x, xyzpp[imid].y, xyzpp[imid].z, 'PA', color='g',
+                size=20)
 
     ax.view_init(elev=viewel, azim=viewaz)
 
